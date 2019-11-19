@@ -112,7 +112,7 @@ async function handleTreeTurnedOff(): Promise<void> {
 async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:FormattedSubmitResponse): Promise<void> {
     let currentBalance = await getCurrentTipbotBalance();
     let tweetMessage = ".@nixerFFM's christmas tree was shining for " + minutes + " minutes!\n\n";
-    tweetMessage+= "Therefore, this IoT tree automatically sent " + xrpPaid + " #XRP through the #XRPL to @"+config.TWITTER_USER_NAME+".\n";
+    tweetMessage+= "Therefore, his IoT tree automatically sent " + xrpPaid + " #XRP through the #XRPL to @"+config.TWITTER_USER_NAME+".\n";
     tweetMessage+= "Transaction:\n";
     tweetMessage+= "https://bithomp.com/explorer/"+txResult['tx_json']['hash']+"\n\n";
     if(currentBalance && currentBalance > 0) {
