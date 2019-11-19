@@ -1,0 +1,7 @@
+.git
+.vscode
+/dist
+/node_modules
+/storage
+
+local_config.txt

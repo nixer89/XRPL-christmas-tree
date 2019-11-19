@@ -1,0 +1,42 @@
+{
+  "name": "xrpl-christmas-tree",
+  "version": "0.0.1",
+  "description": "XRPL connected christmas tree",
+  "main": "server.ts",
+  "scripts": {
+    "start": "node dist/server.js",
+    "develop": "tsc && concurrently \"tsc -w\" \"nodemon dist/server.js\"",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nixer89/XRPL-christmas-tree.git"
+  },
+  "author": "nixer89",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nixer89/XRPL-christmas-tree/issues"
+  },
+  "homepage": "https://github.com/nixer89/XRPL-christmas-tree#readme",
+  "dependencies": {
+    "console-stamp": "^0.2.9",
+    "https-proxy-agent": "^2.2.4",
+    "huejay": "^1.9.0",
+    "node-fetch": "^2.6.0",
+    "node-persist": "^3.0.5",
+    "ripple-lib": "^1.4.2",
+    "twit": "^2.2.11",
+    "typescript": "^3.6.4",
+    "xrpl-tagged-address-codec": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/console-stamp": "^0.2.32",
+    "@types/node": "^10.17.5",
+    "@types/node-fetch": "^2.5.3",
+    "@types/node-persist": "0.0.33",
+    "@types/twit": "^2.2.23",
+    "concurrently": "^4.1.2",
+    "nodemon": "^1.19.4"
+  }
+}
