@@ -129,7 +129,7 @@ async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:Forma
     tweetMessage+= "Therefore, his #XRPL IoT tree automatically sent " + xrpPaid + " #XRP through the #XRPL to @"+config.TWITTER_USER_NAME+".\n";
 
     if(txResult && txResult['tx_json'] && txResult['tx_json']['hash']) {
-        tweetMessage+= "Transaction:\n";
+        tweetMessage+= "\nTransaction:\n";
         tweetMessage+= "https://bithomp.com/explorer/"+txResult['tx_json']['hash']+"\n\n";
     }
 
