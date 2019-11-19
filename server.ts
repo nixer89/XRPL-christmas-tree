@@ -104,7 +104,7 @@ async function handleTreeTurnedOff(): Promise<void> {
         let txResult:FormattedSubmitResponse = await xrplAPI.makePayment(xrpToPay+"", [memo1, memo2, memo3]);
 
         if("tesSUCCESS" === txResult.resultCode) {
-            setTimeout( async () => tweetAboutPayment(xrpToPay, minutes, txResult), 60000);
+            setTimeout( async () => tweetAboutPayment(xrpToPay, minutes, txResult), 30000);
         }
     }
 }
@@ -113,8 +113,12 @@ async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:Forma
     let currentBalance = await getCurrentTipbotBalance();
     let tweetMessage = ".@nixerFFM's christmas tree was shining for " + minutes + " minutes!\n\n";
     tweetMessage+= "Therefore, his IoT tree automatically sent " + xrpPaid + " #XRP through the #XRPL to @"+config.TWITTER_USER_NAME+".\n";
-    tweetMessage+= "Transaction:\n";
-    tweetMessage+= "https://bithomp.com/explorer/"+txResult['tx_json']['hash']+"\n\n";
+
+    if(txResult && txResult['tx_json'] && txResult['tx_json']['hash']) {
+        tweetMessage+= "Transaction:\n";
+        tweetMessage+= "https://bithomp.com/explorer/"+txResult['tx_json']['hash']+"\n\n";
+    }
+
     if(currentBalance && currentBalance > 0) {
         tweetMessage+= "Current account balance: " + currentBalance + " XRP\n";
         tweetMessage+= "(Will be sent to @GoodXrp after christmas!)";
