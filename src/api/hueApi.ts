@@ -26,9 +26,10 @@ export class HueApi {
     }
 
     async discoverBridges(): Promise<any> {
-        let bridges = await hue.discover();
+        //only search for local bridges!
+        let bridges:any[] = await hue.discover({strategy: 'upnp'});
+        console.log("discovered bridges: " + JSON.stringify(bridges));
 
-        console.log("Found bridges: " + JSON.stringify(bridges));
         return bridges[0];
     }
 
@@ -40,7 +41,6 @@ export class HueApi {
             
             groups.forEach(group => {
                 if(config.HUE_GROUP_NAME === group.name) {
-                    console.log("Hue Group: " + JSON.stringify(group));
                     lightOn = group.allOn;
                 }
             });

@@ -7,7 +7,10 @@ import { Destination } from 'xrpl-tagged-address-codec/dist/types';
 export class XRPLApi {
     api:ripple.RippleAPI;
     constructor() {
-        this.api = new ripple.RippleAPI({server: 'wss://s.altnet.rippletest.net', proxy: config.USE_PROXY ? config.PROXY : null});
+        if(config.USE_PROXY)
+            this.api = new ripple.RippleAPI({server: config.XRPL_SERVER, proxy: config.PROXY});
+        else
+            this.api = new ripple.RippleAPI({server: config.XRPL_SERVER});
     }
 
     async makePayment(xrp: string, memos:any[]): Promise<FormattedSubmitResponse> {
