@@ -91,19 +91,24 @@ async function handleTreeTurnedOff(): Promise<void> {
     let startTime = await storage.getItem("startTime");
 
     if(startTime && endTime && (endTime-startTime)>0) {
+        //round to the next fulles minute
         let minutes = Math.ceil((endTime - startTime) / 1000 / 60);
         console.log("minutes: " + minutes);
 
+        //calculate the amount of XRP to pay
         let xrpToPay:number = (minutes*config.DROPS * 0.05)/config.DROPS;
         console.log("xrpToPay: " + xrpToPay);
 
         if(xrpToPay > 0) {
+            //generate memos
             let memo1:any = {type: "ChristmasTree", data:"IoT christmas tree, raising XRP for @GoodXrp charities."};
             let memo2:any = {type: "Running", data: minutes + " minutes"}
             let memo3:any = {type: "Sending", data: xrpToPay + " XRP to @" + config.TWITTER_USER_NAME + " -> (0.05 XRP per minute)"}
 
+            //send XRP payment to tipbot account
             let txResult:FormattedSubmitResponse = await xrplAPI.makePayment(xrpToPay+"", [memo1, memo2, memo3]);
 
+            //tweet about it if payment was successfull
             if(txResult && "tesSUCCESS" === txResult.resultCode)
                 setTimeout( async () => tweetAboutPayment(xrpToPay, minutes, txResult), 30000);
             else
