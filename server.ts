@@ -91,20 +91,26 @@ async function handleTreeTurnedOff(): Promise<void> {
     let startTime = await storage.getItem("startTime");
 
     if(startTime && endTime && (endTime-startTime)>0) {
-        let minutes = Math.round((endTime - startTime) / 1000 / 60)*10;
+        let minutes = Math.ceil((endTime - startTime) / 1000 / 60);
         console.log("minutes: " + minutes);
 
         let xrpToPay:number = (minutes*config.DROPS * 0.05)/config.DROPS;
         console.log("xrpToPay: " + xrpToPay);
 
-        let memo1:any = {type: "ChristmasTree", data:"IoT christmas tree, raising XRP for @GoodXrp charities."};
-        let memo2:any = {type: "Running", data: minutes + " minutes"}
-        let memo3:any = {type: "Sending", data: xrpToPay + " XRP to @" + config.TWITTER_USER_NAME + " -> (0.05 XRP per minute)"}
+        if(xrpToPay > 0) {
+            let memo1:any = {type: "ChristmasTree", data:"IoT christmas tree, raising XRP for @GoodXrp charities."};
+            let memo2:any = {type: "Running", data: minutes + " minutes"}
+            let memo3:any = {type: "Sending", data: xrpToPay + " XRP to @" + config.TWITTER_USER_NAME + " -> (0.05 XRP per minute)"}
 
-        let txResult:FormattedSubmitResponse = await xrplAPI.makePayment(xrpToPay+"", [memo1, memo2, memo3]);
+            let txResult:FormattedSubmitResponse = await xrplAPI.makePayment(xrpToPay+"", [memo1, memo2, memo3]);
 
-        if("tesSUCCESS" === txResult.resultCode) {
-            setTimeout( async () => tweetAboutPayment(xrpToPay, minutes, txResult), 30000);
+            if("tesSUCCESS" === txResult.resultCode)
+                setTimeout( async () => tweetAboutPayment(xrpToPay, minutes, txResult), 30000);
+            else
+                console.log("XRPL payment not successfull. Please check previous logs.");
+
+        } else {
+            console.log("xrpToPay smaller than 0. Somthing went wrong: " + xrpToPay);
         }
     }
 }
