@@ -33,7 +33,7 @@ export class HueApi {
         let groups = await this.client.groups.getAll();
         
         groups.forEach(group => {
-            if('Weihnachtsbaum' === group.name) {
+            if(config.HUE_GROUP_NAME === group.name) {
                 console.log("Hue Group: " + JSON.stringify(group));
                 lightOn = group.allOn;
             }
