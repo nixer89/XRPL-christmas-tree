@@ -18,6 +18,8 @@ export class TwitterApi {
             access_token: config.TWITTER_ACCESS_TOKEN,
             access_token_secret: config.TWITTER_ACCESS_SECRET
         });
+        
+        return true;
     }
 
     async sendTweet(message:string) {

@@ -5,7 +5,10 @@ import { FormattedSubmitResponse } from 'ripple-lib/dist/npm/transaction/submit'
 import { Destination } from 'xrpl-tagged-address-codec/dist/types';
 
 export class XRPLApi {
-    api:ripple.RippleAPI = new ripple.RippleAPI({server: 'wss://s.altnet.rippletest.net', proxy: config.USE_PROXY ? config.PROXY : null});
+    api:ripple.RippleAPI;
+    constructor() {
+        this.api = new ripple.RippleAPI({server: 'wss://s.altnet.rippletest.net', proxy: config.USE_PROXY ? config.PROXY : null});
+    }
 
     async makePayment(xrp: string, memos:any[]): Promise<FormattedSubmitResponse> {
         console.log("XRPL connecting...")

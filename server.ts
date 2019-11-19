@@ -35,11 +35,17 @@ async function initBot() {
 
         console.log("twitter init")
         twitterAPI = new twitter.TwitterApi();
-        await twitterAPI.initTwitter();
+        if(!await twitterAPI.initTwitter()) {
+            console.log("Twitter could not be initialized.");
+            process.stdin.resume();
+        }
 
         console.log("hue init")
         hueApi = new hue.HueApi();
-        await hueApi.initHue(); 
+        if(!await hueApi.initHue()) {
+            console.log("Hue could not be initialized.");
+            process.stdin.resume();
+        }
 
         //init storage
         await storage.init({dir: 'storage/christmasTree'});
