@@ -104,7 +104,7 @@ async function handleTreeTurnedOff(): Promise<void> {
 
             let txResult:FormattedSubmitResponse = await xrplAPI.makePayment(xrpToPay+"", [memo1, memo2, memo3]);
 
-            if("tesSUCCESS" === txResult.resultCode)
+            if(txResult && "tesSUCCESS" === txResult.resultCode)
                 setTimeout( async () => tweetAboutPayment(xrpToPay, minutes, txResult), 30000);
             else
                 console.log("XRPL payment not successfull. Please check previous logs.");
