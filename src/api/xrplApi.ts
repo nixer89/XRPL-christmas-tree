@@ -49,6 +49,18 @@ export class XRPLApi {
             console.log("submitting transaction");
             result = await this.api.submit(signedTransaction.signedTransaction);
 
+            let retryCount = 0;
+            while(retryCount < 10 && result && "tesSUCCESS" != result.resultCode) {
+                //retry to submit transaction 10 times.
+                await new Promise((resolve) => {
+                    setTimeout(async () => {
+                        retryCount++;
+                        result = await this.api.submit(signedTransaction.signedTransaction);
+                        resolve(result);
+                    },4000);
+                });
+            }
+
             console.log(result);
         } catch(err) {
             console.log("Error sending XRP Payment.");
