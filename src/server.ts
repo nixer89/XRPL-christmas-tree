@@ -105,7 +105,7 @@ async function handleTreeTurnedOff(): Promise<void> {
         if(xrpToPay > 0) {
             //generate memos
             let memo1:any = {type: "ChristmasTree", data:"IoT christmas tree, raising XRP for @GoodXrp charities."};
-            let memo2:any = {type: "TreeWasShining", data: minutes + " minutes"}
+            let memo2:any = {type: "TreeWasShiningFor", data: minutes + " minutes"}
             let memo3:any = {type: "Sending", data: xrpToPay + " XRP to @" + config.TWITTER_USER_NAME + " -> (0.05 XRP per minute)"}
 
             //send XRP payment to tipbot account
@@ -126,7 +126,7 @@ async function handleTreeTurnedOff(): Promise<void> {
 async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:FormattedSubmitResponse): Promise<void> {
     let currentBalance = await getCurrentTipbotBalance();
     let tweetMessage = ".@nixerFFM's Christmas Tree was shining for " + minutes + " minutes!\n\n";
-    tweetMessage+= "Therefore, his #XRPL IoT tree automatically sent " + xrpPaid + " #XRP through the #XRPL to @"+config.TWITTER_USER_NAME+".\n";
+    tweetMessage+= "The #XRPL IoT tree automatically sent " + xrpPaid + " #XRP through the XRP Ledger to @"+config.TWITTER_USER_NAME+".\n";
 
     if(txResult && txResult['tx_json'] && txResult['tx_json']['hash']) {
         tweetMessage+= "\nTransaction:\n";
@@ -134,7 +134,7 @@ async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:Forma
     }
 
     if(currentBalance && currentBalance > 0) {
-        tweetMessage+= "Current account balance: " + currentBalance + " XRP\n";
+        tweetMessage+= "Current @xrptipbot account balance: " + currentBalance + " XRP\n";
         tweetMessage+= "(Will be sent to @GoodXrp after christmas!)";
     }
 
