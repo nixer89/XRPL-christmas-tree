@@ -135,7 +135,7 @@ async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:Forma
 
     if(currentBalance && currentBalance > 0) {
         tweetMessage+= "Current @xrptipbot account balance: " + currentBalance + " XRP\n";
-        tweetMessage+= "(Will be sent to @GoodXrp after christmas!)";
+        tweetMessage+= "(Will be sent to @GoodXrp after christmas)";
     }
 
     console.log("sending out tweet...")
