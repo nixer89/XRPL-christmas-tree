@@ -29,40 +29,45 @@ async function initBot() {
         if(config.ENABLE_REMOTE_CONTROL) {
             console.log("remote control init")
             remoteControlApi = new remoteControl.RemoteControlApi();
-            remoteControlApi.init();
+            if(!await remoteControlApi.init()) {
+                console.log("Remote Control API could not be initialized.");
+                process.stdin.resume();
+            } else {
+                console.log("emote Control API initialized successfull.");
+            }
         }
 
-        //console.log("xrpl init")
-        //xrplAPI = new xrpl.XRPLApi();
+        console.log("xrpl init")
+        xrplAPI = new xrpl.XRPLApi();
 
-        //console.log("twitter init")
-        //twitterAPI = new twitter.TwitterApi();
-        //if(!await twitterAPI.initTwitter()) {
-        //    console.log("Twitter could not be initialized.");
-        //    process.stdin.resume();
-        //} else {
-        //    console.log("Twitter initialized successfull.");
-        //}
+        console.log("twitter init")
+        twitterAPI = new twitter.TwitterApi();
+        if(!await twitterAPI.initTwitter()) {
+            console.log("Twitter could not be initialized.");
+            process.stdin.resume();
+        } else {
+            console.log("Twitter initialized successfull.");
+        }
 
-        //console.log("hue init")
-        //hueApi = new hue.HueApi();
-        //if(!await hueApi.initHue()) {
-        //    console.log("Hue could not be initialized.");
-        //    process.stdin.resume();
-        //} else {
-        //    console.log("Hue initialized successfull.");
-        //}
+        console.log("hue init")
+        hueApi = new hue.HueApi();
+        if(!await hueApi.initHue()) {
+            console.log("Hue could not be initialized.");
+            process.stdin.resume();
+        } else {
+            console.log("Hue initialized successfull.");
+        }
 
         //init storage
-        //await storage.init({dir: 'storage/christmasTree'});
+        await storage.init({dir: 'storage/christmasTree'});
         //clear start time parameter
-        //await storage.removeItem("startTime");
+        await storage.removeItem("startTime");
 
         //initialize with tree == off so if tree shines and program starts it will count right away
-        //await storage.setItem("christmasTreeOn", false);
+        await storage.setItem("christmasTreeOn", false);
 
         //check light status every 60 seconds
-        //setInterval(() => checkGroupLights(), 60000);
+        setInterval(() => checkGroupLights(), 60000);
         //test();
         
     } catch(err) {

@@ -4,6 +4,7 @@ import * as config from '../config/config';
 export class HueApi {
     
     client:any;
+    partyModeTimer:NodeJS.Timeout;
 
     async initHue(): Promise<boolean> {
         try {
@@ -76,7 +77,11 @@ export class HueApi {
                 if(config.HUE_PARTY_SCENE_NAME === scene.name) {
                     this.client.scenes.recall(scene);
                     //stop party mode after 2 minutes
-                    setTimeout(() => this.stopPartyMode(), 60000);
+                    if(this.partyModeTimer) {
+                        this.partyModeTimer.refresh();
+                    } else {
+                        this.partyModeTimer = setTimeout(() => this.stopPartyMode(), 60000);
+                    }
                 }
             });
         } catch(err) {

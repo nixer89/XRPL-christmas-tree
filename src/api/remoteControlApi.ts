@@ -17,7 +17,7 @@ export class RemoteControlApi {
         this.hue = new hue.HueApi();
     }
 
-    async init() {
+    async init(): Promise<boolean> {
         try {
             //connecting hue
             await this.hue.initHue();
@@ -61,8 +61,11 @@ export class RemoteControlApi {
             this.mqttClient.on('message', async (topic, message) => {
                 this.checkIncomingTipbotTrx(JSON.parse(message.toString()));
             });
+
+            return true;
         } catch(err) {
             console.log(JSON.stringify(err));
+            return false;
         }
     }
 
