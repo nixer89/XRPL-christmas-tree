@@ -8,6 +8,9 @@ export class RemoteControlApi {
     api:ripple.RippleAPI;
     hue:hue.HueApi;
     mqttClient: mqtt.Client;
+
+    partyModeTimer:NodeJS.Timeout;
+
     constructor() {
         if(config.USE_PROXY)
             this.api = new ripple.RippleAPI({server: config.XRPL_SERVER, proxy: config.PROXY});
@@ -84,15 +87,36 @@ export class RemoteControlApi {
     }
 
     async handleIncomingTransaction(amount: number, destTag?: number) {
-        if(amount == 1.337 || amount == 0.5) {
+        console.log("received transaction with " + amount + " XRP and destination tag: " + destTag);
+        if(amount == 1.337 || amount == 0.5 ) {
             await this.hue.changeGroupStatus(config.HUE_GROUP_NAME, true);
 
             //check for party mode
             if(amount == 1.337 || (destTag && destTag === 1337))
-                this.hue.startPartyMode();
+                this.startPartyMode();
 
         } else if(amount == 1 ) {
             await this.hue.changeGroupStatus(config.HUE_GROUP_NAME, false);
         }
+    }
+
+    async startPartyMode(): Promise<void> {
+        console.log("starting party mode");
+        try {
+            this.hue.changeGroupStatus(config.HUE_PARTY_GROUP_NAME, true);
+
+            if(this.partyModeTimer) {
+                this.partyModeTimer.refresh();
+            } else {
+                this.partyModeTimer = setTimeout(() => this.stopPartyMode(), 60000);
+            }
+        } catch(err) {
+            console.log(JSON.stringify(err));
+        }
+    }
+
+    async stopPartyMode(): Promise<any> {
+        console.log("stopping Partymode!");
+        this.hue.changeGroupStatus(config.HUE_PARTY_GROUP_NAME, false);
     }
 }

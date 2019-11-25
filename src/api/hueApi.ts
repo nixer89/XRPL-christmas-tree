@@ -1,22 +1,36 @@
 import * as hue from 'huejay';
 import * as config from '../config/config';
 
+import * as process  from 'child_process';
+
 export class HueApi {
     
     client:any;
-    partyModeTimer:NodeJS.Timeout;
 
-    async initHue(): Promise<boolean> {
+    async initHue(isReinit?:boolean): Promise<boolean> {
         try {
             this.client = new hue.Client({
                 host:     config.HUE_BRIDGE_IP,
                 username: config.HUE_USER_NAME,
             });
 
-            if(this.client)
-                return this.client.bridge.isAuthenticated();
-            else
-                return false;
+            //restart PI in case nothing works
+            if(isReinit && (!this.client || !this.client.isAuthenticated())) {
+                // try to rediscover bridge
+                let bridge = await this.discoverBridges();
+
+                this.client = new hue.Client({
+                    host:     bridge.ip,
+                    username: config.HUE_USER_NAME,
+                });
+
+                //nothing works, restart!
+                if(!this.client || !this.client.isAuthenticated())
+                    process.exec('sudo init 6')
+            }
+
+            return this.client && this.client.bridge.isAuthenticated();
+
         } catch(err) {
             console.log("Error discovering bridges");
             console.log(JSON.stringify(err));
@@ -31,14 +45,14 @@ export class HueApi {
         return bridges[0];
     }
 
-    async checkGroupStatus(): Promise<boolean> {
+    async checkGroupStatus(groupName:string): Promise<boolean> {
         let lightOn = false;
         
         try {
             let groups = await this.client.groups.getAll();
             
             groups.forEach(group => {
-                if(config.HUE_GROUP_NAME === group.name) {
+                if(groupName === group.name) {
                     lightOn = group.allOn;
                 }
             });
@@ -46,7 +60,7 @@ export class HueApi {
             console.log("Error getting light data");
             console.log(JSON.stringify(err));
             //try to reinitialize
-            await this.initHue();
+            await this.initHue(true);
         }
 
         return lightOn;
@@ -67,28 +81,5 @@ export class HueApi {
             console.log("Error changing light status");
             console.log(JSON.stringify(err));
         }
-    }
-
-    async startPartyMode(): Promise<void> {
-        try {
-            let scenes = await this.client.scenes.getAll();
-            scenes.forEach(scene => {
-                if(config.HUE_PARTY_SCENE_NAME === scene.name) {
-                    this.client.scenes.recall(scene);
-                    //stop party mode after 2 minutes
-                    if(this.partyModeTimer) {
-                        this.partyModeTimer.refresh();
-                    } else {
-                        this.partyModeTimer = setTimeout(() => this.stopPartyMode(), 60000);
-                    }
-                }
-            });
-        } catch(err) {
-            console.log(JSON.stringify(err));
-        }
-    }
-
-    async stopPartyMode(): Promise<any> {
-        this.changeGroupStatus(config.HUE_PARTY_GROUP_NAME, false);
     }
 }

@@ -33,7 +33,7 @@ async function initBot() {
                 console.log("Remote Control API could not be initialized.");
                 process.stdin.resume();
             } else {
-                console.log("emote Control API initialized successfull.");
+                console.log("Remote Control API initialized successfull.");
             }
         }
 
@@ -76,7 +76,7 @@ async function initBot() {
 }
 
 async function checkGroupLights() {
-    let isCurrentlyOn = await hueApi.checkGroupStatus();
+    let isCurrentlyOn = await hueApi.checkGroupStatus(config.HUE_GROUP_NAME);
     christmasTreeOn = await storage.getItem("christmasTreeOn");
     
     if(isCurrentlyOn && !christmasTreeOn) {
@@ -156,7 +156,6 @@ async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:Forma
         console.log("sending out tweet...")
         await twitterAPI.sendTweet(tweetMessage);
     }
-        
 }
 
 async function getCurrentTipbotBalance(): Promise<any> {
