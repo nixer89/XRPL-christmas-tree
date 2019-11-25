@@ -1,11 +1,13 @@
-//general
+//GENERAL
 export const DROPS:number = 1000000;
 export const XRP_PER_MINUTE:number = Number(process.env.XRP_PER_MINUTE) || 0.05;
 export const USE_PROXY:boolean = Boolean(process.env.USE_PROXY) || true;
 export const PROXY:string = "http://proxy.wincor-nixdorf.com:81";
 export const XRPTIPBOT_MQTT_URL:string = process.env.XRPTIPBOT_MQTT_URL || 'ws://mqtt.api.xrptipbot-stats.com:4001';
 
-//hue api
+//HUE API
+//hue bridge IP is shown in Hue App
+export const HUE_BRIDGE_IP = process.env.HUE_BRIDGE_IP;
 export const HUE_USER_NAME:string = process.env.HUE_USER_NAME || 'TEST_USER';
 export const HUE_GROUP_NAME:string = process.env.HUE_GROUP_NAME || 'TEST_GROUP';
 export const HUE_PARTY_SCENE_NAME:string = process.env.HUE_PARTY_SCENE_NAME  || 'PARTY_SCENE';
