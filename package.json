@@ -1,6 +1,6 @@
 {
   "name": "xrpl-christmas-tree",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "XRPL connected christmas tree",
   "main": "server.ts",
   "scripts": {

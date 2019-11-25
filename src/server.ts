@@ -71,6 +71,7 @@ async function initBot() {
         //test();
         
     } catch(err) {
+        console.log("error starting bot. Could not initialize bot.")
         writeToConsole(JSON.stringify(err));
     }
 }
