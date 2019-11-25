@@ -58,6 +58,9 @@ export class RemoteControlApi {
                 console.log("subscribing to topic: " + 'tip/received/twitter/'+config.TWITTER_USER_NAME);
                 this.mqttClient.subscribe('tip/received/twitter/'+config.TWITTER_USER_NAME);
                 this.mqttClient.subscribe('tip/received/twitter/'+config.TWITTER_USER_NAME.toLowerCase());
+
+                this.mqttClient.subscribe('deposit/twitter/'+config.TWITTER_USER_NAME);
+                this.mqttClient.subscribe('deposit/twitter/'+config.TWITTER_USER_NAME.toLowerCase());
                 console.log("waiting for tips...");
             });
 
