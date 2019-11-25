@@ -23,6 +23,7 @@
     "console-stamp": "^0.2.9",
     "https-proxy-agent": "^2.2.4",
     "huejay": "^1.9.0",
+    "mqtt": "^3.0.0",
     "node-fetch": "^2.6.0",
     "node-persist": "^3.0.5",
     "ripple-lib": "^1.4.2",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@types/console-stamp": "^0.2.32",
+    "@types/mqtt": "^2.5.0",
     "@types/node": "^10.17.5",
     "@types/node-fetch": "^2.5.3",
     "@types/node-persist": "0.0.33",

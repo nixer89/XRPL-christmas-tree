@@ -33,7 +33,7 @@ export class HueApi {
         return bridges[0];
     }
 
-    async checkChristmasTreeStatus(): Promise<boolean> {
+    async checkGroupStatus(): Promise<boolean> {
         let lightOn = false;
         
         try {
@@ -50,5 +50,41 @@ export class HueApi {
         }
 
         return lightOn;
+    }
+
+    async changeGroupStatus(groupName: string, turnOn:boolean): Promise<void> {
+        console.log("setting group: " + groupName + " to: " + (turnOn ? 'on' : 'off'));
+        try {
+            let groups = await this.client.groups.getAll();
+            
+            groups.forEach(group => {
+                if(groupName === group.name) {
+                    group.on = turnOn;
+                    this.client.groups.save(group);
+                }
+            });
+        } catch(err) {
+            console.log("Error changing light status");
+            console.log(JSON.stringify(err));
+        }
+    }
+
+    async startPartyMode(): Promise<void> {
+        try {
+            let scenes = await this.client.scenes.getAll();
+            scenes.forEach(scene => {
+                if(config.HUE_PARTY_SCENE_NAME === scene.name) {
+                    this.client.scenes.recall(scene);
+                    //stop party mode after 2 minutes
+                    setTimeout(() => this.stopPartyMode(), 60000);
+                }
+            });
+        } catch(err) {
+            console.log(JSON.stringify(err));
+        }
+    }
+
+    async stopPartyMode(): Promise<any> {
+        this.changeGroupStatus(config.HUE_PARTY_GROUP_NAME, false);
     }
 }

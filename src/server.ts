@@ -1,6 +1,7 @@
 import * as twitter from './api/twitterApi';
 import * as xrpl from './api/xrplApi';
 import * as hue from './api/hueApi';
+import * as remoteControl from  './api/remoteControlApi';
 import * as config from './config/config';
 import * as util from './util';
 import * as fetch from 'node-fetch';
@@ -16,6 +17,7 @@ let proxy = new HttpsProxyAgent(config.PROXY);
 let twitterAPI:twitter.TwitterApi;
 let xrplAPI:xrpl.XRPLApi;
 let hueApi:hue.HueApi;
+let remoteControlApi:remoteControl.RemoteControlApi;
 
 let christmasTreeOn:boolean = false;
 
@@ -24,37 +26,43 @@ initBot();
 async function initBot() {
     //check if all environment variables are set
     try {
-        console.log("xrpl init")
-        xrplAPI = new xrpl.XRPLApi();
-
-        console.log("twitter init")
-        twitterAPI = new twitter.TwitterApi();
-        if(!await twitterAPI.initTwitter()) {
-            console.log("Twitter could not be initialized.");
-            process.stdin.resume();
-        } else {
-            console.log("Twitter initialized successfull.");
+        if(config.ENABLE_REMOTE_CONTROL) {
+            console.log("remote control init")
+            remoteControlApi = new remoteControl.RemoteControlApi();
+            remoteControlApi.init();
         }
 
-        console.log("hue init")
-        hueApi = new hue.HueApi();
-        if(!await hueApi.initHue()) {
-            console.log("Hue could not be initialized.");
-            process.stdin.resume();
-        } else {
-            console.log("Hue initialized successfull.");
-        }
+        //console.log("xrpl init")
+        //xrplAPI = new xrpl.XRPLApi();
+
+        //console.log("twitter init")
+        //twitterAPI = new twitter.TwitterApi();
+        //if(!await twitterAPI.initTwitter()) {
+        //    console.log("Twitter could not be initialized.");
+        //    process.stdin.resume();
+        //} else {
+        //    console.log("Twitter initialized successfull.");
+        //}
+
+        //console.log("hue init")
+        //hueApi = new hue.HueApi();
+        //if(!await hueApi.initHue()) {
+        //    console.log("Hue could not be initialized.");
+        //    process.stdin.resume();
+        //} else {
+        //    console.log("Hue initialized successfull.");
+        //}
 
         //init storage
-        await storage.init({dir: 'storage/christmasTree'});
+        //await storage.init({dir: 'storage/christmasTree'});
         //clear start time parameter
-        await storage.removeItem("startTime");
+        //await storage.removeItem("startTime");
 
         //initialize with tree == off so if tree shines and program starts it will count right away
-        await storage.setItem("christmasTreeOn", false);
+        //await storage.setItem("christmasTreeOn", false);
 
         //check light status every 60 seconds
-        setInterval(() => checkChristmasTreeLights(), 60000);
+        //setInterval(() => checkGroupLights(), 60000);
         //test();
         
     } catch(err) {
@@ -62,8 +70,8 @@ async function initBot() {
     }
 }
 
-async function checkChristmasTreeLights() {
-    let isCurrentlyOn = await hueApi.checkChristmasTreeStatus();
+async function checkGroupLights() {
+    let isCurrentlyOn = await hueApi.checkGroupStatus();
     christmasTreeOn = await storage.getItem("christmasTreeOn");
     
     if(isCurrentlyOn && !christmasTreeOn) {
@@ -138,8 +146,12 @@ async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:Forma
         tweetMessage+= "(Will be sent to @GoodXrp after christmas)";
     }
 
-    console.log("sending out tweet...")
-    await twitterAPI.sendTweet(tweetMessage);
+    //better not send out tweets in remote control :)
+    if(!config.ENABLE_REMOTE_CONTROL) {
+        console.log("sending out tweet...")
+        await twitterAPI.sendTweet(tweetMessage);
+    }
+        
 }
 
 async function getCurrentTipbotBalance(): Promise<any> {
