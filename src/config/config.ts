@@ -1,14 +1,16 @@
-//general
+//GENERAL
 export const DROPS = 1000000;
 export const XRP_PER_MINUTE = process.env.XRP_PER_MINUTE || 0.05;
 export const USE_PROXY = process.env.USE_PROXY || false;
 export const PROXY = "http://proxy.wincor-nixdorf.com:81";
 
-//hue api
+//HUE API
+//hue bridge IP is shown in Hue App
+export const HUE_BRIDGE_IP = process.env.HUE_BRIDGE_IP;
 export const HUE_USER_NAME = process.env.HUE_USER_NAME;
 export const HUE_GROUP_NAME = process.env.HUE_GROUP_NAME;
 
-//twitter api real
+//TWITTER API
 export const TWITTER_USER_NAME = process.env.TWITTER_USER_NAME || 'XRP_IoT_Tree';
 export const TWITTER_CONSUMER_KEY = process.env.TWITTER_CONSUMER_KEY;
 export const TWITTER_CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET;

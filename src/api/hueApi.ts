@@ -7,18 +7,15 @@ export class HueApi {
 
     async initHue(): Promise<boolean> {
         try {
-            let bridge = await this.discoverBridges();
+            this.client = new hue.Client({
+                host:     config.HUE_BRIDGE_IP,
+                username: config.HUE_USER_NAME,
+            });
 
-            if(bridge && bridge.ip) {
-                this.client = new hue.Client({
-                    host:     bridge.ip,
-                    username: config.HUE_USER_NAME,
-                });
-
+            if(this.client)
                 return this.client.bridge.isAuthenticated();
-            } else {
+            else
                 return false;
-            }
         } catch(err) {
             console.log("Error discovering bridges");
             console.log(JSON.stringify(err));
@@ -27,7 +24,7 @@ export class HueApi {
 
     async discoverBridges(): Promise<any> {
         //only search for local bridges!
-        let bridges:any[] = await hue.discover({strategy: 'upnp'});
+        let bridges:any[] = await hue.discover();
         console.log("discovered bridges: " + JSON.stringify(bridges));
 
         return bridges[0];
@@ -47,6 +44,8 @@ export class HueApi {
         } catch(err) {
             console.log("Error getting light data");
             console.log(JSON.stringify(err));
+            //try to reinitialize
+            await this.initHue();
         }
 
         return lightOn;
