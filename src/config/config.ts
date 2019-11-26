@@ -1,7 +1,7 @@
 //general
 export const DROPS:number = 1000000;
-export const XRP_PER_MINUTE:number = parseFloat(process.env.XRP_PER_MINUTE) || 0.05;
-export const USE_PROXY:boolean = (process.env.USE_PROXY.toLocaleLowerCase() === 'true') || false;
+export const XRP_PER_MINUTE:number = (process.env.XRP_PER_MINUTE ? parseFloat(process.env.XRP_PER_MINUTE) : 0.05);
+export const USE_PROXY:boolean = (process.env.USE_PROXY ? (process.env.USE_PROXY.toLowerCase() === 'true') : false);
 export const PROXY:string = "http://proxy.wincor-nixdorf.com:81";
 export const XRPTIPBOT_MQTT_URL:string = process.env.XRPTIPBOT_MQTT_URL || 'mqtt://mqtt.api.xrptipbot-stats.com:4001';
 
@@ -27,4 +27,4 @@ export const XRPL_SOURCE_ACCOUNT_SECRET:string = process.env.XRPL_SOURCE_ACCOUNT
 export const XRPL_DESTINATION_ACCOUNT_X_ADDRESS:string = process.env.XRPL_DESTINATION_ACCOUNT_X_ADDRESS || 'XV4DUpDDhGe6uwTitMx8kzfSbe5Jiyy85DEKbWSV8ckMah5';
 
 //REMOTECONTROL
-export const ENABLE_REMOTE_CONTROL:boolean = (process.env.ENABLE_REMOTE_CONTROL.toLocaleLowerCase() === 'true') || false;
+export const ENABLE_REMOTE_CONTROL:boolean = (process.env.ENABLE_REMOTE_CONTROL? (process.env.ENABLE_REMOTE_CONTROL.toLocaleLowerCase() === 'true') : false);
