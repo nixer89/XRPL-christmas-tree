@@ -111,7 +111,7 @@ export class RemoteControlApi {
             if(this.partyModeTimer) {
                 this.partyModeTimer.refresh();
             } else {
-                this.partyModeTimer = setTimeout(() => this.stopPartyMode(), 60000);
+                this.partyModeTimer = setTimeout(() => this.stopPartyMode(), 180000);
             }
         } catch(err) {
             console.log(JSON.stringify(err));
