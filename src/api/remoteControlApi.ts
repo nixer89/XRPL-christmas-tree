@@ -98,7 +98,7 @@ export class RemoteControlApi {
             if(amount == 1.337 || (destTag && destTag === 1337))
                 this.startPartyMode();
 
-        } else if(amount == 1 ) {
+        } else if(amount == 1) {
             await this.hue.changeGroupStatus(config.HUE_GROUP_NAME, false);
         }
     }

@@ -52,8 +52,13 @@ async function initBot() {
         console.log("hue init")
         hueApi = new hue.HueApi();
         if(!await hueApi.initHue()) {
-            console.log("Hue could not be initialized.");
-            process.stdin.resume();
+            //try to reinitialize in different way!
+            if(!await hueApi.initHue(true)) {
+                console.log("Hue could not be initialized.");
+                process.stdin.resume();
+            } else {
+                console.log("Hue initialized successfull.");
+            }
         } else {
             console.log("Hue initialized successfull.");
         }

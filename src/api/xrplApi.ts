@@ -52,11 +52,11 @@ export class XRPLApi {
             let retryCount = 0;
             while(retryCount < 10 && result && "tesSUCCESS" != result.resultCode) {
                 //retry to submit transaction 10 times.
-                await new Promise((resolve) => {
+                result = await new Promise((resolve) => {
                     setTimeout(async () => {
                         retryCount++;
-                        result = await this.api.submit(signedTransaction.signedTransaction);
-                        resolve(result);
+                        let promiseResult:FormattedSubmitResponse = await this.api.submit(signedTransaction.signedTransaction);
+                        resolve(promiseResult);
                     },4000);
                 });
             }
