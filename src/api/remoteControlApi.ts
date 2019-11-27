@@ -59,8 +59,6 @@ export class RemoteControlApi {
                 this.mqttClient.subscribe('tip/received/twitter/'+config.TWITTER_USER_NAME);
                 this.mqttClient.subscribe('tip/received/twitter/'+config.TWITTER_USER_NAME.toLowerCase());
 
-                this.mqttClient.subscribe('deposit/twitter/'+config.TWITTER_USER_NAME);
-                this.mqttClient.subscribe('deposit/twitter/'+config.TWITTER_USER_NAME.toLowerCase());
                 console.log("waiting for tips...");
             });
 
@@ -76,12 +74,12 @@ export class RemoteControlApi {
     }
 
     async checkIncomingXRPLTrx(trx: any) {
-        if(trx && trx.validated && trx.transaction.TransactionType === 'Payment') {
-            let amount:number = Number(this.api.dropsToXrp(trx.meta.delivered_amount));
-            let destTag:number = trx.transaction.DestinationTag;
+        if(trx && trx.validated && trx.transaction.TransactionType === 'Payment'
+            && trx.meta.TransactionResult === 'tesSUCCESS' && trx.transaction.Destination === config.XRPL_SOURCE_ACCOUNT) {
+                let amount:number = Number(this.api.dropsToXrp(trx.meta.delivered_amount));
+                let destTag:number = trx.transaction.DestinationTag;
 
-            console.log("sent " + amount + " XRP to Destination Tag: " + destTag);
-            this.handleIncomingTransaction(amount, destTag);
+                this.handleIncomingTransaction(amount, destTag);
         }
     }
 
