@@ -20,13 +20,15 @@ All proceeds going to @GoodXrp!
 ### party mode:
 - send 0.5 XRP via XRPL to `XVN5ZDcAd6bW8Nu3sMJMYfkFHyxUxmobRHUahW1QjXEJnp7` ( you don't know what that is? visit: [https://xrpaddress.info/](https://xrpaddress.info/)
 
-## via `@xrptipbot` transaction (delay up to 1 minute!)
+
+## via `@xrptipbot`
+Prefered method: @xrptipbot App! (https://xrptipbot.com/app). Tips on twitter (not via app) will have a delay from up to 90 seconds!
 ### turn on:
-- send 0.5 XRP via @xrptipbot to @XRP_IoT_Tree
+- send 0.5 XRP via @xrptipbot App to @XRP_IoT_Tree
 ### turn off:
-- send 1 XRP via @xrptipbot to @XRP_IoT_Tree
+- send 1 XRP via @xrptipbot App to @XRP_IoT_Tree
 ### party mode:
-- send 1.337 XRP via @xrptipbot to @XRP_IoT_Tree
+- send 1.337 XRP via @xrptipbot App to @XRP_IoT_Tree
 
 
 Party Mode: can't be turned off and will run at least 3 minutes

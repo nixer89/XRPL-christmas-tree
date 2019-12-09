@@ -4,6 +4,7 @@ export const XRP_PER_MINUTE:number = (process.env.XRP_PER_MINUTE ? parseFloat(pr
 export const USE_PROXY:boolean = (process.env.USE_PROXY ? (process.env.USE_PROXY.toLowerCase() === 'true') : false);
 export const PROXY:string = "http://proxy.wincor-nixdorf.com:81";
 export const XRPTIPBOT_MQTT_URL:string = process.env.XRPTIPBOT_MQTT_URL || 'mqtt://mqtt.api.xrptipbot-stats.com:4001';
+export const ABLY_CHANNEL_ID:string = process.env.ABLY_CHANNEL_ID;
 
 //hue api
 export const HUE_BRIDGE_IP:string = process.env.HUE_BRIDGE_IP;

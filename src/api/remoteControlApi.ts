@@ -1,5 +1,6 @@
 import * as ripple from 'ripple-lib';
 import * as mqtt from 'mqtt';
+import * as ably from 'ably';
 import * as hue from './hueApi'
 import * as config from '../config/config';
 
@@ -8,6 +9,7 @@ export class RemoteControlApi {
     api:ripple.RippleAPI;
     hue:hue.HueApi;
     mqttClient: mqtt.Client;
+    ablyCLient:ably.Realtime;
 
     partyModeTimer:NodeJS.Timeout;
 
@@ -18,6 +20,7 @@ export class RemoteControlApi {
             this.api = new ripple.RippleAPI({server: config.XRPL_SERVER});
 
         this.hue = new hue.HueApi();
+        this.ablyCLient = new ably.Realtime('B7SnrQ.qc3_zg:wozN1XAAVhiNqJdK');
     }
 
     async init(): Promise<boolean> {
@@ -50,6 +53,19 @@ export class RemoteControlApi {
                 this.checkIncomingXRPLTrx(trx);
             });
 
+            //check for incoming tips via @xrptipbot app using Ably
+            if(config.ABLY_CHANNEL_ID) {
+                console.log("connecting to ably channel...");
+                let pushChannel:ably.Types.RealtimeChannelCallbacks = this.ablyCLient.channels.get(config.ABLY_CHANNEL_ID);
+                console.log("waiting for tips...");
+                pushChannel.subscribe('bump', message => {
+                    let tipMessage = JSON.parse(message.data);
+                    if(tipMessage && tipMessage.code == 200 && tipMessage.message === 'BUMP_OK' && tipMessage.me.slug === config.TWITTER_USER_NAME) {
+                        this.handleIncomingTransaction(tipMessage.amount);
+                    }
+                });
+            }
+
             console.log("connecting mqtt...");
             //connect to XRPTipBot API MQTT
             this.mqttClient = mqtt.connect(config.XRPTIPBOT_MQTT_URL);
@@ -65,7 +81,7 @@ export class RemoteControlApi {
             this.mqttClient.on('message', async (topic, message) => {
                 this.checkIncomingTipbotTrx(JSON.parse(message.toString()));
             });
-
+            
             return true;
         } catch(err) {
             console.log(JSON.stringify(err));
@@ -84,7 +100,9 @@ export class RemoteControlApi {
     }
 
     async checkIncomingTipbotTrx(tip: any) {
-        this.handleIncomingTransaction(tip.xrp);
+        //only allow tips directly sent on twitter here. Tips through app are handled through Ably!
+        if(tip.network === 'twitter')
+            this.handleIncomingTransaction(tip.xrp);
     }
 
     async handleIncomingTransaction(amount: number, destTag?: number) {

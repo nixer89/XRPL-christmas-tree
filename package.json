@@ -1,6 +1,6 @@
 {
   "name": "xrpl-christmas-tree",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "XRPL connected christmas tree",
   "main": "server.ts",
   "scripts": {
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/nixer89/XRPL-christmas-tree#readme",
   "dependencies": {
+    "ably": "^1.1.22",
     "console-stamp": "^0.2.9",
     "https-proxy-agent": "^2.2.4",
     "huejay": "^1.9.0",
