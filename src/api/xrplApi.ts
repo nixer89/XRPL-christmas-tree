@@ -81,7 +81,12 @@ export class XRPLApi {
         } catch(err) {
             console.log("Error sending XRP Payment.");
             console.log(JSON.stringify(err));
+            if(this.api.isConnected())
+                await this.api.disconnect();
         }
+
+        if(this.api.isConnected())
+            await this.api.disconnect();
 
         return result;
     }
