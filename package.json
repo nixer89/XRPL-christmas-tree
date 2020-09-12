@@ -25,7 +25,7 @@
     "https-proxy-agent": "^2.2.4",
     "huejay": "^1.9.0",
     "mqtt": "^3.0.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "node-persist": "^3.0.5",
     "ripple-lib": "^1.4.2",
     "twit": "^2.2.11",
