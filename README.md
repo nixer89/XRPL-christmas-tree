@@ -6,9 +6,7 @@ To read more about it, you can check this blog post:
 
 # Remote controlling the christmas tree
 This is only possible during a live event (also known as live stream).
-Outside of live streams, no remote control is possible! Your sent funds won't have any effect but they are still getting forwarded to @GoodXrp!
-
-All proceeds going to @GoodXrp!
+Outside of live streams, no remote control is possible! Your sent funds won't have any effect!
 
 # How to remote control my christmas tree:
 

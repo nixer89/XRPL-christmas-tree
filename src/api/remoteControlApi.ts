@@ -1,5 +1,4 @@
 import * as ripple from 'ripple-lib';
-import * as mqtt from 'mqtt';
 import * as ably from 'ably';
 import * as hue from './hueApi'
 import * as config from '../config/config';
@@ -8,7 +7,6 @@ export class RemoteControlApi {
 
     api:ripple.RippleAPI;
     hue:hue.HueApi;
-    mqttClient: mqtt.Client;
     ablyCLient:ably.Realtime;
 
     partyModeTimer:NodeJS.Timeout;
@@ -65,22 +63,6 @@ export class RemoteControlApi {
                     }
                 });
             }
-
-            console.log("connecting mqtt...");
-            //connect to XRPTipBot API MQTT
-            this.mqttClient = mqtt.connect(config.XRPTIPBOT_MQTT_URL);
-            this.mqttClient.on('connect', () => {
-                console.log("MQTT connected. Subscribing to topics:");
-                console.log("subscribing to topic: " + 'tip/received/twitter/'+config.TWITTER_USER_NAME);
-                this.mqttClient.subscribe('tip/received/twitter/'+config.TWITTER_USER_NAME);
-                this.mqttClient.subscribe('tip/received/twitter/'+config.TWITTER_USER_NAME.toLowerCase());
-
-                console.log("waiting for tips...");
-            });
-
-            this.mqttClient.on('message', async (topic, message) => {
-                this.checkIncomingTipbotTrx(JSON.parse(message.toString()));
-            });
             
             return true;
         } catch(err) {

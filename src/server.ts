@@ -123,7 +123,7 @@ async function handleTreeTurnedOff(): Promise<void> {
 
         if(xrpToPay > 0) {
             //generate memos
-            let memo1:any = {type: "ChristmasTree", data:"IoT christmas tree, raising XRP for @GoodXrp charities."};
+            let memo1:any = {type: "ChristmasTree", data:"IoT christmas tree"};
             let memo2:any = {type: "TreeWasShiningFor", data: minutes + " minutes"}
             let memo3:any = {type: "Sending", data: xrpToPay + " XRP to @" + config.TWITTER_USER_NAME + " -> (0.05 XRP per minute)"}
 
@@ -154,7 +154,6 @@ async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:Forma
 
     if(currentBalance && currentBalance > 0) {
         tweetMessage+= "Current @xrptipbot account balance: " + currentBalance + " XRP\n";
-        tweetMessage+= "(Will be sent to @GoodXrp after christmas)";
     }
 
     //better not send out tweets in remote control :)
