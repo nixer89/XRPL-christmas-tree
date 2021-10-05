@@ -1,74 +1,60 @@
-import * as ripple from 'ripple-lib';
 import * as codec from 'xrpl-tagged-address-codec'
 import * as config from '../config/config';
-import { FormattedSubmitResponse } from 'ripple-lib/dist/npm/transaction/submit';
 import { Destination } from 'xrpl-tagged-address-codec/dist/types';
 import { init } from 'node-persist';
+import { Client, Payment, Wallet, SubmitResponse } from 'xrpl';
 
 export class XRPLApi {
-    api:ripple.RippleAPI;
+    //api:ripple.RippleAPI;
+    xrplClient: Client;
+
+
     constructor() {
         this.init();
     }
 
     init() {
-        if(config.USE_PROXY)
-            this.api = new ripple.RippleAPI({server: config.XRPL_SERVER, proxy: config.PROXY});
-        else
-            this.api = new ripple.RippleAPI({server: config.XRPL_SERVER});
+        this.xrplClient = new Client("wss://xrplcluster.com");
     }
 
-    async makePayment(xrp: string, memos:any[], retry?: boolean): Promise<FormattedSubmitResponse> {
-        let result:FormattedSubmitResponse = null;
+    async makePayment(xrp: string, memos:any[], retry?: boolean): Promise<SubmitResponse> {
+        let ledgerResponse:SubmitResponse = null;
         try {
             console.log("XRPL connecting...")
-            await this.api.connect();
+            await this.xrplClient.connect();
 
-            if(this.api.isConnected()) {
+            if(this.xrplClient.isConnected()) {
             
                 let destinationAccount:Destination = codec.Decode(config.XRPL_DESTINATION_ACCOUNT_X_ADDRESS);
                 //prepare transaction
                 console.log("preparing transaction");
-                const preparedTx = await this.api.preparePayment(config.XRPL_SOURCE_ACCOUNT, {
-                    source: {
-                        address: config.XRPL_SOURCE_ACCOUNT,
-                        maxAmount: {
-                            value: xrp,
-                            currency: 'XRP'
-                        }
-                    },
-                    destination: {
-                        address: destinationAccount.account,
-                        tag: Number(destinationAccount.tag),
-                        amount: {
-                            value: xrp,
-                            currency: 'XRP'
-                        }
-                    },
-                    memos: memos,
-                });
 
-                //sign transaction
-                console.log("signing transaction");
-                const signedTransaction = await this.api.sign(preparedTx.txJSON, config.XRPL_SOURCE_ACCOUNT_SECRET);
+                let newPayment:Payment = {
+                    TransactionType: "Payment",
+                    Account: config.XRPL_SOURCE_ACCOUNT,
+                    Amount: xrp,
+                    Destination: destinationAccount.account,
+                    DestinationTag: Number(destinationAccount.tag),
+                    Memos: memos
+                }
+                
+                let wallet:Wallet = Wallet.fromSecret(config.XRPL_SOURCE_ACCOUNT_SECRET);
 
-                //submit transaction
-                console.log("submitting transaction");
-                result = await this.api.submit(signedTransaction.signedTransaction);
+                let ledgerResponse = await this.xrplClient.submitTransaction(wallet, newPayment);
 
                 let retryCount = 0;
-                while(retryCount < 10 && result && "tesSUCCESS" != result.resultCode) {
+                while(retryCount < 10 && ledgerResponse && ledgerResponse.result && "tesSUCCESS" != ledgerResponse.result.engine_result) {
                     //retry to submit transaction 10 times.
-                    result = await new Promise((resolve) => {
+                    ledgerResponse = await new Promise((resolve) => {
                         setTimeout(async () => {
                             retryCount++;
-                            let promiseResult:FormattedSubmitResponse = await this.api.submit(signedTransaction.signedTransaction);
+                            let promiseResult:SubmitResponse = await this.xrplClient.submitTransaction(wallet, newPayment);
                             resolve(promiseResult);
                         },4000);
                     });
                 }
 
-                console.log(result);
+                console.log(ledgerResponse);
             } else {
                 if(!retry) {
                     init();
@@ -81,13 +67,13 @@ export class XRPLApi {
         } catch(err) {
             console.log("Error sending XRP Payment.");
             console.log(JSON.stringify(err));
-            if(this.api.isConnected())
-                await this.api.disconnect();
+            if(this.xrplClient.isConnected())
+                await this.xrplClient.disconnect();
         }
 
-        if(this.api.isConnected())
-            await this.api.disconnect();
+        if(this.xrplClient.isConnected())
+            await this.xrplClient.disconnect();
 
-        return result;
+        return ledgerResponse;
     }
 }

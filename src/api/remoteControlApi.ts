@@ -1,21 +1,22 @@
-import * as ripple from 'ripple-lib';
 import * as ably from 'ably';
 import * as hue from './hueApi'
 import * as config from '../config/config';
 
+import { Client, SubscribeRequest, SubscribeResponse, TransactionStream, xrpToDrops} from 'xrpl';
+
+
 export class RemoteControlApi {
 
-    api:ripple.RippleAPI;
+    xrplClient:Client;
+
     hue:hue.HueApi;
     ablyCLient:ably.Realtime;
 
     partyModeTimer:NodeJS.Timeout;
 
     constructor() {
-        if(config.USE_PROXY)
-            this.api = new ripple.RippleAPI({server: config.XRPL_SERVER, proxy: config.PROXY});
-        else
-            this.api = new ripple.RippleAPI({server: config.XRPL_SERVER});
+
+        this.xrplClient = new Client("wss://xrplcluster.com");
 
         this.hue = new hue.HueApi();
         this.ablyCLient = new ably.Realtime('B7SnrQ.qc3_zg:wozN1XAAVhiNqJdK');
@@ -28,13 +29,21 @@ export class RemoteControlApi {
 
             //connect to XRPL
             console.log("XRPL connecting...")
-            await this.api.connect();
+            await this.xrplClient.connect();
+            //await this.api.connect();
             console.log("XRPL connected.")
 
-            //subscribe to account
-            let subscribeResponse:any = await this.api.request('subscribe', {
+            let subscription: SubscribeRequest = {
+                command: "subscribe",
                 accounts:[config.XRPL_SOURCE_ACCOUNT]
-            });
+            }
+
+            let subscribeResponse: SubscribeResponse = await this.xrplClient.request(subscription);
+
+            //subscribe to account
+            //let subscribeResponse:any = await this.api.request('subscribe', {
+            //    accounts:[config.XRPL_SOURCE_ACCOUNT]
+            //});
 
             if(subscribeResponse) {
                 console.log("Successfully subscribed");
@@ -45,11 +54,12 @@ export class RemoteControlApi {
             }
 
             //listen on transactions
-            this.api.connection.on('transaction', (trx) => {
+
+            this.xrplClient.on('transaction', trx => {
                 console.log("got new transaction:");
                 //handle new incoming transaction
                 this.checkIncomingXRPLTrx(trx);
-            });
+            })
 
             //check for incoming tips via @xrptipbot app using Ably
             if(config.ABLY_CHANNEL_ID) {
@@ -71,13 +81,15 @@ export class RemoteControlApi {
         }
     }
 
-    async checkIncomingXRPLTrx(trx: any) {
+    async checkIncomingXRPLTrx(trx: TransactionStream) {
         if(trx && trx.validated && trx.transaction.TransactionType === 'Payment'
             && trx.meta.TransactionResult === 'tesSUCCESS' && trx.transaction.Destination === config.XRPL_SOURCE_ACCOUNT) {
-                let amount:number = Number(this.api.dropsToXrp(trx.meta.delivered_amount));
-                let destTag:number = trx.transaction.DestinationTag;
+                if(typeof(trx.meta.delivered_amount) === "string" ) {
+                    let amount:number = Number(xrpToDrops(trx.meta.delivered_amount));
+                    let destTag:number = trx.transaction.DestinationTag;
 
-                this.handleIncomingTransaction(amount, destTag);
+                    this.handleIncomingTransaction(amount, destTag);
+                }
         }
     }
 

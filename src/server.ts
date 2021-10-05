@@ -7,7 +7,7 @@ import * as util from './util';
 import * as fetch from 'node-fetch';
 import * as storage from 'node-persist'
 import * as HttpsProxyAgent from 'https-proxy-agent';
-import { FormattedSubmitResponse } from 'ripple-lib/dist/npm/transaction/submit';
+import { SubmitResponse } from 'xrpl';
 
 import consoleStamp = require("console-stamp");
 consoleStamp(console, { pattern: 'yyyy-mm-dd HH:MM:ss' });
@@ -128,10 +128,10 @@ async function handleTreeTurnedOff(): Promise<void> {
             let memo3:any = {type: "Sending", data: xrpToPay + " XRP to @" + config.TWITTER_USER_NAME + " -> (0.05 XRP per minute)"}
 
             //send XRP payment to tipbot account
-            let txResult:FormattedSubmitResponse = await xrplAPI.makePayment(xrpToPay+"", [memo1, memo2, memo3]);
+            let txResult:SubmitResponse = await xrplAPI.makePayment(xrpToPay+"", [memo1, memo2, memo3]);
 
             //tweet about it if payment was successfull
-            if(txResult && "tesSUCCESS" === txResult.resultCode)
+            if(txResult && "tesSUCCESS" === txResult.result.engine_result)
                 setTimeout( async () => tweetAboutPayment(xrpToPay, minutes, txResult), 30000);
             else
                 console.log("XRPL payment not successfull. Please check previous logs.");
@@ -142,14 +142,14 @@ async function handleTreeTurnedOff(): Promise<void> {
     }
 }
 
-async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:FormattedSubmitResponse): Promise<void> {
+async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:SubmitResponse): Promise<void> {
     let currentBalance = await getCurrentTipbotBalance();
     let tweetMessage = ".@nixerFFM's Christmas Tree was shining for " + minutes + " minutes!\n\n";
     tweetMessage+= "The #XRPL IoT tree automatically sent " + xrpPaid + " #XRP through the XRP Ledger to @"+config.TWITTER_USER_NAME+".\n";
 
-    if(txResult && txResult['tx_json'] && txResult['tx_json']['hash']) {
+    if(txResult && txResult.result.tx_json && txResult.result.tx_json.hash) {
         tweetMessage+= "\nTransaction:\n";
-        tweetMessage+= "https://bithomp.com/explorer/"+txResult['tx_json']['hash']+"\n\n";
+        tweetMessage+= "https://bithomp.com/explorer/"+txResult.result.tx_json.hash+"\n\n";
     }
 
     if(currentBalance && currentBalance > 0) {
