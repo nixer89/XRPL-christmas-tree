@@ -1,5 +1,5 @@
 import * as Twit from 'twit';
-import * as config from '../config/config';
+import * as config from '../config/local_config';
 import * as util from '../util';
 
 import consoleStamp = require("console-stamp");

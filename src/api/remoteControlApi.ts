@@ -1,8 +1,7 @@
-import * as ably from 'ably';
 import * as hue from './hueApi'
-import * as config from '../config/config';
+import * as config from '../config/local_config';
 
-import { Client, SubscribeRequest, SubscribeResponse, TransactionStream, xrpToDrops} from 'xrpl';
+import { Client, dropsToXrp, SubscribeRequest, SubscribeResponse, TransactionStream, xrpToDrops} from 'xrpl';
 
 
 export class RemoteControlApi {
@@ -10,16 +9,14 @@ export class RemoteControlApi {
     xrplClient:Client;
 
     hue:hue.HueApi;
-    ablyCLient:ably.Realtime;
 
     partyModeTimer:NodeJS.Timeout;
 
     constructor() {
 
-        this.xrplClient = new Client("wss://xrplcluster.com");
+        this.xrplClient = new Client(config.XRPL_SERVER);
 
         this.hue = new hue.HueApi();
-        this.ablyCLient = new ably.Realtime('B7SnrQ.qc3_zg:wozN1XAAVhiNqJdK');
     }
 
     async init(): Promise<boolean> {
@@ -59,20 +56,7 @@ export class RemoteControlApi {
                 console.log("got new transaction:");
                 //handle new incoming transaction
                 this.checkIncomingXRPLTrx(trx);
-            })
-
-            //check for incoming tips via @xrptipbot app using Ably
-            if(config.ABLY_CHANNEL_ID) {
-                console.log("connecting to ably channel...");
-                let pushChannel:ably.Types.RealtimeChannelCallbacks = this.ablyCLient.channels.get(config.ABLY_CHANNEL_ID);
-                console.log("waiting for tips...");
-                pushChannel.subscribe('bump', message => {
-                    let tipMessage = JSON.parse(message.data);
-                    if(tipMessage && tipMessage.code == 200 && tipMessage.message === 'BUMP_OK' && tipMessage.me.slug === config.TWITTER_USER_NAME) {
-                        this.handleIncomingTransaction(tipMessage.amount);
-                    }
-                });
-            }
+            });
             
             return true;
         } catch(err) {
@@ -85,10 +69,9 @@ export class RemoteControlApi {
         if(trx && trx.validated && trx.transaction.TransactionType === 'Payment'
             && trx.meta.TransactionResult === 'tesSUCCESS' && trx.transaction.Destination === config.XRPL_SOURCE_ACCOUNT) {
                 if(typeof(trx.meta.delivered_amount) === "string" ) {
-                    let amount:number = Number(xrpToDrops(trx.meta.delivered_amount));
-                    let destTag:number = trx.transaction.DestinationTag;
+                    let amount:number = Number(dropsToXrp(trx.meta.delivered_amount));
 
-                    this.handleIncomingTransaction(amount, destTag);
+                    this.handleIncomingTransaction(amount);
                 }
         }
     }
@@ -99,16 +82,16 @@ export class RemoteControlApi {
             this.handleIncomingTransaction(tip.xrp);
     }
 
-    async handleIncomingTransaction(amount: number, destTag?: number) {
-        console.log("received transaction with " + amount + " XRP and destination tag: " + destTag);
-        if(amount == 1.337 || amount == 0.5 ) {
+    async handleIncomingTransaction(amount: number) {
+        console.log("received transaction with " + amount + " XRP.");
+        if(amount == 1.337 || amount == 1 ) {
             await this.hue.changeGroupStatus(config.HUE_GROUP_NAME, true);
 
             //check for party mode
-            if(amount == 1.337 || (destTag && destTag === 1337))
-                this.startPartyMode();
+            //if(amount == 1.337 || (destTag && destTag === 1337))
+                //this.startPartyMode();
 
-        } else if(amount == 1) {
+        } else if(amount == 0.5) {
             await this.hue.changeGroupStatus(config.HUE_GROUP_NAME, false);
         }
     }

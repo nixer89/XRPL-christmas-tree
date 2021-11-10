@@ -2,17 +2,15 @@ import * as twitter from './api/twitterApi';
 import * as xrpl from './api/xrplApi';
 import * as hue from './api/hueApi';
 import * as remoteControl from  './api/remoteControlApi';
-import * as config from './config/config';
+import * as config from './config/local_config';
 import * as util from './util';
-import * as fetch from 'node-fetch';
 import * as storage from 'node-persist'
-import * as HttpsProxyAgent from 'https-proxy-agent';
-import { SubmitResponse } from 'xrpl';
+import { AccountInfoRequest, AccountInfoResponse, convertStringToHex, SubmitResponse, TxResponse } from 'xrpl';
 
 import consoleStamp = require("console-stamp");
+import { AccountRoot } from 'xrpl/dist/npm/models/ledger';
+import { Memo } from 'xrpl/dist/npm/models/common';
 consoleStamp(console, { pattern: 'yyyy-mm-dd HH:MM:ss' });
-
-let proxy = new HttpsProxyAgent(config.PROXY);
 
 let twitterAPI:twitter.TwitterApi;
 let xrplAPI:xrpl.XRPLApi;
@@ -77,7 +75,7 @@ async function initBot() {
         
     } catch(err) {
         console.log("error starting bot. Could not initialize bot.")
-        writeToConsole(JSON.stringify(err));
+        writeToConsole(err);
     }
 }
 
@@ -123,15 +121,15 @@ async function handleTreeTurnedOff(): Promise<void> {
 
         if(xrpToPay > 0) {
             //generate memos
-            let memo1:any = {type: "ChristmasTree", data:"IoT christmas tree"};
-            let memo2:any = {type: "TreeWasShiningFor", data: minutes + " minutes"}
-            let memo3:any = {type: "Sending", data: xrpToPay + " XRP to @" + config.TWITTER_USER_NAME + " -> (0.05 XRP per minute)"}
+            let memo1:Memo = {Memo : {MemoType: convertStringToHex("ChristmasTree"), MemoData: convertStringToHex("IoT christmas tree")}}
+            let memo2:Memo = {Memo : {MemoType: convertStringToHex("TreeWasShiningFor"), MemoData: convertStringToHex(minutes + " minutes")}}
+            let memo3:Memo = {Memo : {MemoType: convertStringToHex("Sending"), MemoData: convertStringToHex(xrpToPay + " XRP to @" + config.TWITTER_USER_NAME + " -> (0.05 XRP per minute)")}}
 
             //send XRP payment to tipbot account
-            let txResult:SubmitResponse = await xrplAPI.makePayment(xrpToPay+"", [memo1, memo2, memo3]);
+            let txResult:TxResponse = await xrplAPI.makePayment(xrpToPay+"", [memo1, memo2, memo3]);
 
             //tweet about it if payment was successfull
-            if(txResult && "tesSUCCESS" === txResult.result.engine_result)
+            if(txResult && typeof(txResult.result.meta) === 'object' && "tesSUCCESS" === txResult.result.meta.TransactionResult)
                 setTimeout( async () => tweetAboutPayment(xrpToPay, minutes, txResult), 30000);
             else
                 console.log("XRPL payment not successfull. Please check previous logs.");
@@ -142,19 +140,22 @@ async function handleTreeTurnedOff(): Promise<void> {
     }
 }
 
-async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:SubmitResponse): Promise<void> {
-    let currentBalance = await getCurrentTipbotBalance();
+async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:TxResponse): Promise<void> {
+    let currentBalance = await getCurrentTreeAccountBalance();
     let tweetMessage = ".@nixerFFM's Christmas Tree was shining for " + minutes + " minutes!\n\n";
     tweetMessage+= "The #XRPL IoT tree automatically sent " + xrpPaid + " #XRP through the XRP Ledger to @"+config.TWITTER_USER_NAME+".\n";
 
-    if(txResult && txResult.result.tx_json && txResult.result.tx_json.hash) {
+    if(txResult && txResult.result && txResult.result.hash) {
         tweetMessage+= "\nTransaction:\n";
-        tweetMessage+= "https://bithomp.com/explorer/"+txResult.result.tx_json.hash+"\n\n";
+        tweetMessage+= "https://bithomp.com/explorer/"+txResult.result.hash+"\n\n";
     }
 
     if(currentBalance && currentBalance > 0) {
-        tweetMessage+= "Current @xrptipbot account balance: " + currentBalance + " XRP\n";
+        tweetMessage+= "Current XRP Ledger account balance: " + currentBalance + " XRP\n";
     }
+
+    console.log("tweet message:");
+    console.log(tweetMessage)
 
     //better not send out tweets in remote control :)
     if(!config.ENABLE_REMOTE_CONTROL) {
@@ -163,16 +164,30 @@ async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:Submi
     }
 }
 
-async function getCurrentTipbotBalance(): Promise<any> {
-    try {
-        let fetchResponse:any = await fetch.default('https://www.xrptipbot.com/u:'+config.TWITTER_USER_NAME+'/n:twitter/f:json', {agent: config.USE_PROXY ? proxy : null});
-        let feed = await fetchResponse.json();
+async function getCurrentTreeAccountBalance(): Promise<number> {
 
-        return feed.stats.balance.amount
+    try {
+        if(!xrplAPI.xrplClient.isConnected()) {
+            await xrplAPI.xrplClient.connect()
+        }
+        let accountInfoRequest:AccountInfoRequest = {
+            account: config.XRPL_DESTINATION_ACCOUNT,
+            command: 'account_info',
+            strict: true
+        }
+
+        let accontInfo:AccountInfoResponse = await xrplAPI.xrplClient.request(accountInfoRequest);
+        if(accontInfo && accontInfo.result && accontInfo.result.account_data) {
+            let accountData:AccountRoot = accontInfo.result.account_data;
+
+            return parseInt(accountData.Balance)/1000000;
+        }
     } catch(err) {
-        console.log(JSON.stringify(err))
-        return null;
+        console.log("error getting account balance")
+        console.log(err)
     }
+
+    return 0
 }
 
 function writeToConsole(message:string) {

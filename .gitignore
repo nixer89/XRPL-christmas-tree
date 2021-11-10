@@ -4,4 +4,4 @@
 /node_modules
 /storage
 
-local_config.txt
+src/config/local_config.ts

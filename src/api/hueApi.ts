@@ -1,5 +1,5 @@
 import * as hue from 'huejay';
-import * as config from '../config/config';
+import * as config from '../config/local_config';
 
 import * as process  from 'child_process';
 
@@ -14,10 +14,13 @@ export class HueApi {
                 username: config.HUE_USER_NAME,
             });
 
+            console.log("connect hue");
             //restart PI in case nothing works
             if(isReinit && (!this.client || !this.client.isAuthenticated())) {
                 // try to rediscover bridge
                 let bridge = await this.discoverBridges();
+
+                console.log("bridges discovered");
 
                 this.client = new hue.Client({
                     host:     bridge.ip,
@@ -25,8 +28,10 @@ export class HueApi {
                 });
 
                 //nothing works, restart!
-                if(!this.client || !this.client.isAuthenticated())
+                if(!this.client || !this.client.isAuthenticated()) {
+                    console.log("could not connect hue!");
                     process.exec('sudo init 6')
+                }
             }
 
             return this.client && this.client.bridge.isAuthenticated();
