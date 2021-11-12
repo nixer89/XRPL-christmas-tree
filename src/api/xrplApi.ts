@@ -39,7 +39,7 @@ export class XRPLApi {
                     Memos: memos
                 }
                 
-                let wallet:Wallet = Wallet.fromSecret(config.XRPL_SOURCE_ACCOUNT_SECRET);
+                let wallet:Wallet = Wallet.fromSecret(config.XRPL_SOURCE_ACCOUNT_SECRET, {masterAddress: config.XRPL_SOURCE_ACCOUNT});
 
                 console.log(JSON.stringify(newPayment));
 

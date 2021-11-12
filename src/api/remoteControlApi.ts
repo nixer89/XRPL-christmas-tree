@@ -1,7 +1,7 @@
 import * as hue from './hueApi'
 import * as config from '../config/local_config';
 
-import { Client, dropsToXrp, SubscribeRequest, SubscribeResponse, TransactionStream, xrpToDrops} from 'xrpl';
+import { Client, dropsToXrp, SubscribeRequest, SubscribeResponse, TransactionStream} from 'xrpl';
 
 
 export class RemoteControlApi {
@@ -43,7 +43,7 @@ export class RemoteControlApi {
             //});
 
             if(subscribeResponse) {
-                console.log("Successfully subscribed");
+                console.log("Successfully subscribed to xrpl account");
                 console.log("waiting for XRPL Transactions ...");
             } else {
                 console.log("could not subscribe")
@@ -67,19 +67,13 @@ export class RemoteControlApi {
 
     async checkIncomingXRPLTrx(trx: TransactionStream) {
         if(trx && trx.validated && trx.transaction.TransactionType === 'Payment'
-            && trx.meta.TransactionResult === 'tesSUCCESS' && trx.transaction.Destination === config.XRPL_SOURCE_ACCOUNT) {
+            && trx.meta.TransactionResult === 'tesSUCCESS' && trx.transaction.Destination === config.XRPL_DESTINATION_ACCOUNT) {
                 if(typeof(trx.meta.delivered_amount) === "string" ) {
                     let amount:number = Number(dropsToXrp(trx.meta.delivered_amount));
 
                     this.handleIncomingTransaction(amount);
                 }
         }
-    }
-
-    async checkIncomingTipbotTrx(tip: any) {
-        //only allow tips directly sent on twitter here. Tips through app are handled through Ably!
-        if(tip.network === 'twitter')
-            this.handleIncomingTransaction(tip.xrp);
     }
 
     async handleIncomingTransaction(amount: number) {

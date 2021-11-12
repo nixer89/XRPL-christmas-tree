@@ -143,7 +143,7 @@ async function handleTreeTurnedOff(): Promise<void> {
 async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:TxResponse): Promise<void> {
     let currentBalance = await getCurrentTreeAccountBalance();
     let tweetMessage = ".@nixerFFM's Christmas Tree was shining for " + minutes + " minutes!\n\n";
-    tweetMessage+= "The #XRPL IoT tree automatically sent " + xrpPaid + " #XRP through the XRP Ledger to @"+config.TWITTER_USER_NAME+".\n";
+    tweetMessage+= "@nixerFFM automatically sent " + xrpPaid + " #XRP through the XRP Ledger to @"+config.TWITTER_USER_NAME+" to pay for its bills.\n";
 
     if(txResult && txResult.result && txResult.result.hash) {
         tweetMessage+= "\nTransaction:\n";
