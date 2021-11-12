@@ -1,7 +1,7 @@
-import * as config from '../config/local_config';
+import * as config from '../config/config';
 import { Destination } from 'xrpl-tagged-address-codec/dist/types';
 import { init } from 'node-persist';
-import { Client, Payment, Wallet, SubmitResponse, TxResponse, xrpToDrops } from 'xrpl';
+import { Client, Payment, Wallet, TxResponse, xrpToDrops } from 'xrpl';
 import { Memo } from 'xrpl/dist/npm/models/common';
 
 export class XRPLApi {

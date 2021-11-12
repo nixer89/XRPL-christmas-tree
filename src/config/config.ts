@@ -20,7 +20,7 @@ export const XRPL_SERVER:string = process.env.XRPL_SERVER || 'wss://s.altnet.rip
 //Source Account
 export const XRPL_SOURCE_ACCOUNT:string = process.env.XRPL_SOURCE_ACCOUNT;
 export const XRPL_SOURCE_ACCOUNT_SECRET:string = process.env.XRPL_SOURCE_ACCOUNT_SECRET;
-//Destination Account im X-Address format
+//Destination Account
 export const XRPL_DESTINATION_ACCOUNT:string = process.env.XRPL_DESTINATION_ACCOUNT;
 
 //REMOTECONTROL

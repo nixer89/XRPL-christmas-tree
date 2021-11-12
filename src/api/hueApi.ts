@@ -1,5 +1,5 @@
 import * as hue from 'huejay';
-import * as config from '../config/local_config';
+import * as config from '../config/config';
 
 import * as process  from 'child_process';
 

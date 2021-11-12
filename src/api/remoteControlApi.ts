@@ -1,5 +1,5 @@
 import * as hue from './hueApi'
-import * as config from '../config/local_config';
+import * as config from '../config/config';
 
 import { Client, dropsToXrp, SubscribeRequest, SubscribeResponse, TransactionStream} from 'xrpl';
 
