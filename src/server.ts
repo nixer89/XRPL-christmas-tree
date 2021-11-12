@@ -2,7 +2,7 @@ import * as twitter from './api/twitterApi';
 import * as xrpl from './api/xrplApi';
 import * as hue from './api/hueApi';
 import * as remoteControl from  './api/remoteControlApi';
-import * as config from './config/local_config';
+import * as config from './config/config';
 import * as util from './util';
 import * as storage from 'node-persist'
 import { AccountInfoRequest, AccountInfoResponse, convertStringToHex, SubmitResponse, TxResponse } from 'xrpl';
