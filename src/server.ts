@@ -158,10 +158,10 @@ async function tweetAboutPayment(xrpPaid:number, minutes: number, txResult:TxRes
     console.log(tweetMessage)
 
     //better not send out tweets in remote control :)
-    if(!config.ENABLE_REMOTE_CONTROL) {
+    //if(!config.ENABLE_REMOTE_CONTROL) {
         console.log("sending out tweet...")
         await twitterAPI.sendTweet(tweetMessage);
-    }
+    //}
 }
 
 async function getCurrentTreeAccountBalance(): Promise<number> {

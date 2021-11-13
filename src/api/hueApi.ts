@@ -38,7 +38,7 @@ export class HueApi {
 
         } catch(err) {
             console.log("Error discovering bridges");
-            console.log(JSON.stringify(err));
+            console.log(err);
         }
     }
 
