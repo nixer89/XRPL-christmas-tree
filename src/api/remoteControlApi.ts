@@ -78,14 +78,14 @@ export class RemoteControlApi {
 
     async handleIncomingTransaction(amount: number) {
         console.log("received transaction with " + amount + " XRP.");
-        if(amount == 1.337 || amount == 1 ) {
+        if(amount >= 1 ) {
             await this.hue.changeGroupStatus(config.HUE_GROUP_NAME, true);
 
             //check for party mode
             //if(amount == 1.337 || (destTag && destTag === 1337))
                 //this.startPartyMode();
 
-        } else if(amount == 0.5) {
+        } else if(amount < 1) {
             await this.hue.changeGroupStatus(config.HUE_GROUP_NAME, false);
         }
     }
