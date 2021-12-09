@@ -32,7 +32,7 @@ export class RemoteControlApi {
 
             let subscription: SubscribeRequest = {
                 command: "subscribe",
-                accounts:[config.XRPL_SOURCE_ACCOUNT]
+                accounts:[config.XRPL_DESTINATION_ACCOUNT]
             }
 
             let subscribeResponse: SubscribeResponse = await this.xrplClient.request(subscription);
