@@ -32,7 +32,7 @@ export class XRPLApi {
 
                 console.log(JSON.stringify(serverInfo));
 
-                let fee = feeSugar.default(this.xrplClient);
+                let fee = await feeSugar.default(this.xrplClient);
                 console.log("calculated fee: " + fee);
             
                 let destinationAccount:Destination = {
