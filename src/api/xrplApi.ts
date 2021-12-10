@@ -4,6 +4,8 @@ import { init } from 'node-persist';
 import { Client, Payment, Wallet, TxResponse, xrpToDrops } from 'xrpl';
 import { Memo } from 'xrpl/dist/npm/models/common';
 
+import * as feeSugar from 'xrpl/dist/npm/sugar/getFeeXrp'
+
 export class XRPLApi {
     //api:ripple.RippleAPI;
     xrplClient: Client;
@@ -24,6 +26,14 @@ export class XRPLApi {
             await this.xrplClient.connect();
 
             if(this.xrplClient.isConnected()) {
+
+                //get server info:
+                let serverInfo = (await this.xrplClient.request({ command: 'server_info' })).result.info
+
+                console.log(JSON.stringify(serverInfo));
+
+                let fee = feeSugar.default(this.xrplClient);
+                console.log("calculated fee: " + fee);
             
                 let destinationAccount:Destination = {
                     account: config.XRPL_DESTINATION_ACCOUNT
