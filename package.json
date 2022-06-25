@@ -22,7 +22,7 @@
   "dependencies": {
     "console-stamp": "^0.2.10",
     "huejay": "^1.9.0",
-    "node-fetch": "^2.6.6",
+    "node-fetch": "^2.6.7",
     "node-persist": "^3.1.0",
     "twit": "^2.2.11",
     "typescript": "^3.9.10",
